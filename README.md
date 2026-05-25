@@ -37,6 +37,9 @@ schema field.
 
 ## Layout
 
+See [`POLICY_INDEX.md`](POLICY_INDEX.md) for the full per-SDK rule list
+(ID, title, scope, severity, source file).
+
 Rules are grouped by `<category>/<topic>.yaml`:
 
 ```
@@ -51,7 +54,6 @@ claude_sdk/                           Claude Agent SDK rules (CSDK-NNN)
 openai_sdk/                           OpenAI Agents SDK rules (OAI-NNN)
 ├── agent_safety.yaml                 OAI-101..104 (agent scope)
 ├── decorator_config.yaml             OAI-003, OAI-004
-├── mcp_safety.yaml                   OAI-105 (agent scope)
 ├── network.yaml                      OAI-005
 ├── path_safety.yaml                  OAI-006
 ├── tool_definition.yaml              OAI-001, OAI-002

@@ -47,3 +47,32 @@ rules:
     fix: >
       Add type hints to every parameter (def fetch(url: str, timeout: int = 10) -> dict).
       Use Pydantic models or TypedDict for structured inputs when complex.
+
+  - id: OAI-007
+    title: Ambiguous tool name
+    scope: tool
+    severity: low
+    confidence: 0.9
+    language: python
+    applies_to:
+      - openai_tool
+    match:
+      name_in:
+        - process
+        - handle
+        - run
+        - do
+        - execute
+        - perform
+        - work
+        - go
+        - thing
+        - stuff
+    explanation: >
+      Tool names like `process`, `handle`, or `run` give the model no signal
+      about intent. The model will either call this tool for the wrong job or
+      refuse to call it at all when a better-named alternative is present.
+    fix: >
+      Rename to a verb-object form, e.g. `summarize_invoice`, `fetch_weather`.
+    references:
+      - "OWASP LLM Top 10:2025 LLM06 Excessive Agency — https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"

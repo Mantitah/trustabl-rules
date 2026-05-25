@@ -16,7 +16,6 @@ rules:
     language: python
     applies_to:
       - claude_sdk_tool
-      - mcp_tool
     match:
       has_docstring: false
     explanation: >
@@ -36,7 +35,6 @@ rules:
     language: python
     applies_to:
       - claude_sdk_tool
-      - mcp_tool
     match:
       all:
         - has_params: true
@@ -58,7 +56,6 @@ rules:
     language: python
     applies_to:
       - claude_sdk_tool
-      - mcp_tool
     match:
       name_in:
         - process
