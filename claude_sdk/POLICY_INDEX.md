@@ -1,4 +1,4 @@
-# Claude Agent SDK policy index (auto generated)
+# Claude Agent SDK policy index 
 
 10 rules — 7 tool · 2 agent · 1 subagent
 

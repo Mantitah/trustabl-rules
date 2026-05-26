@@ -1,4 +1,4 @@
-# OpenAI Agents SDK policy index (auto generated)
+# OpenAI Agents SDK policy index
 
 16 rules — 9 tool · 6 agent · 1 repo
 

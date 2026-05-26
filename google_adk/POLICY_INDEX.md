@@ -1,4 +1,4 @@
-# Google ADK policy index (auto generated)
+# Google ADK policy index 
 
 13 rules — 8 tool · 5 agent
 
