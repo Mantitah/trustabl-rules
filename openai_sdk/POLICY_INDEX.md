@@ -1,6 +1,6 @@
 # OpenAI Agents SDK policy index
 
-16 rules — 9 tool · 6 agent · 1 repo
+20 rules — 13 tool · 6 agent · 1 repo
 
 Risk score = `severity_weight × confidence × 100` (engine formula; weights: low=0.15, medium=0.40, high=0.70). Higher = worse.
 
@@ -15,10 +15,14 @@ Risk score = `severity_weight × confidence × 100` (engine formula; weights: lo
 |  7 | OAI-007  | OpenAI SDK | tool  | openai_tool                         | Ambiguous tool name                                                        | low      | 0.90       | 13.5 | [tool_definition.yaml](tool_definition.yaml)      |
 |  8 | OAI-008  | OpenAI SDK | tool  | openai_tool                         | Tool raises exceptions without a structured error contract                 | medium   | 0.60       | 24.0 | [error_handling.yaml](error_handling.yaml)        |
 |  9 | OAI-009  | OpenAI SDK | tool  | openai_tool                         | Mutating tool has no idempotency key                                       | medium   | 0.55       | 22.0 | [idempotency.yaml](idempotency.yaml)              |
-| 10 | OAI-101  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent has no input_guardrails AND wires shell or filesystem-touching tools | high     | 0.85       | 59.5 | [agent_safety.yaml](agent_safety.yaml)            |
-| 11 | OAI-102  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent uses tool_use_behavior="stop_on_first_tool"                          | high     | 0.95       | 66.5 | [agent_safety.yaml](agent_safety.yaml)            |
-| 12 | OAI-103  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | tool_choice="required" combined with reset_tool_choice=False               | high     | 0.95       | 66.5 | [agent_safety.yaml](agent_safety.yaml)            |
-| 13 | OAI-104  | OpenAI SDK | agent | openai_agent                        | Raw Agent (not SandboxAgent) wires shell or filesystem-touching tools      | medium   | 0.75       | 30.0 | [agent_safety.yaml](agent_safety.yaml)            |
-| 14 | OAI-106  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent wires MCP servers without input_guardrails                           | high     | 0.90       | 63.0 | [mcp_safety.yaml](mcp_safety.yaml)                |
-| 15 | OAI-109  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent uses WebSearchTool without input_guardrails                          | high     | 0.85       | 59.5 | [agent_safety.yaml](agent_safety.yaml)            |
-| 16 | OAI-201  | OpenAI SDK | repo  | openai_agents                       | Project uses default OpenAI tracing                                        | medium   | 0.80       | 32.0 | [tracing.yaml](tracing.yaml)                      |
+| 10 | OAI-010  | OpenAI SDK | tool  | openai_tool                         | Tool function prints to stdout for diagnostics                             | low      | 0.65       | 9.75 | [observability.yaml](observability.yaml)          |
+| 11 | OAI-011  | OpenAI SDK | tool  | openai_tool                         | urllib network call has no timeout                                         | high     | 0.85       | 59.5 | [network.yaml](network.yaml)                      |
+| 12 | OAI-012  | OpenAI SDK | tool  | openai_tool                         | Tool body spawns a subprocess                                              | high     | 0.90       | 63.0 | [shell_safety.yaml](shell_safety.yaml)            |
+| 13 | OAI-013  | OpenAI SDK | tool  | openai_tool                         | Tool body calls eval/exec/compile on dynamic input                         | high     | 0.90       | 63.0 | [code_execution.yaml](code_execution.yaml)        |
+| 14 | OAI-101  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent has no input_guardrails AND wires shell or filesystem-touching tools | high     | 0.85       | 59.5 | [agent_safety.yaml](agent_safety.yaml)            |
+| 15 | OAI-102  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent uses tool_use_behavior="stop_on_first_tool"                          | high     | 0.95       | 66.5 | [agent_safety.yaml](agent_safety.yaml)            |
+| 16 | OAI-103  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | tool_choice="required" combined with reset_tool_choice=False               | high     | 0.95       | 66.5 | [agent_safety.yaml](agent_safety.yaml)            |
+| 17 | OAI-104  | OpenAI SDK | agent | openai_agent                        | Raw Agent (not SandboxAgent) wires shell or filesystem-touching tools      | medium   | 0.75       | 30.0 | [agent_safety.yaml](agent_safety.yaml)            |
+| 18 | OAI-106  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent wires MCP servers without input_guardrails                           | high     | 0.90       | 63.0 | [mcp_safety.yaml](mcp_safety.yaml)                |
+| 19 | OAI-109  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent uses WebSearchTool without input_guardrails                          | high     | 0.85       | 59.5 | [agent_safety.yaml](agent_safety.yaml)            |
+| 20 | OAI-201  | OpenAI SDK | repo  | openai_agents                       | Project uses default OpenAI tracing                                        | medium   | 0.80       | 32.0 | [tracing.yaml](tracing.yaml)                      |
