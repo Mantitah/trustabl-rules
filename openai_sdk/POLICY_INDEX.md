@@ -1,6 +1,6 @@
 # OpenAI Agents SDK policy index (auto generated)
 
-15 rules — 9 tool · 5 agent · 1 repo
+16 rules — 9 tool · 6 agent · 1 repo
 
 Risk score = `severity_weight × confidence × 100` (engine formula; weights: low=0.15, medium=0.40, high=0.70). Higher = worse.
 
@@ -19,5 +19,6 @@ Risk score = `severity_weight × confidence × 100` (engine formula; weights: lo
 | 11 | OAI-102  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent uses tool_use_behavior="stop_on_first_tool"                          | high     | 0.95       | 66.5 | [agent_safety.yaml](agent_safety.yaml)            |
 | 12 | OAI-103  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | tool_choice="required" combined with reset_tool_choice=False               | high     | 0.95       | 66.5 | [agent_safety.yaml](agent_safety.yaml)            |
 | 13 | OAI-104  | OpenAI SDK | agent | openai_agent                        | Raw Agent (not SandboxAgent) wires shell or filesystem-touching tools      | medium   | 0.75       | 30.0 | [agent_safety.yaml](agent_safety.yaml)            |
-| 14 | OAI-109  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent uses WebSearchTool without input_guardrails                          | high     | 0.85       | 59.5 | [agent_safety.yaml](agent_safety.yaml)            |
-| 15 | OAI-201  | OpenAI SDK | repo  | openai_agents                       | Project uses default OpenAI tracing                                        | medium   | 0.80       | 32.0 | [tracing.yaml](tracing.yaml)                      |
+| 14 | OAI-106  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent wires MCP servers without input_guardrails                           | high     | 0.90       | 63.0 | [mcp_safety.yaml](mcp_safety.yaml)                |
+| 15 | OAI-109  | OpenAI SDK | agent | openai_agent, openai_sandbox_agent  | Agent uses WebSearchTool without input_guardrails                          | high     | 0.85       | 59.5 | [agent_safety.yaml](agent_safety.yaml)            |
+| 16 | OAI-201  | OpenAI SDK | repo  | openai_agents                       | Project uses default OpenAI tracing                                        | medium   | 0.80       | 32.0 | [tracing.yaml](tracing.yaml)                      |

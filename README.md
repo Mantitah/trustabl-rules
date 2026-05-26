@@ -52,8 +52,9 @@ claude_sdk/                           Claude Agent SDK rules (CSDK-NNN)
 ├── path_safety.yaml                  CSDK-004
 └── tool_definition.yaml              CSDK-001, CSDK-002, CSDK-007
 openai_sdk/                           OpenAI Agents SDK rules (OAI-NNN)
-├── agent_safety.yaml                 OAI-101..104 (agent scope)
+├── agent_safety.yaml                 OAI-101..104, OAI-109 (agent scope)
 ├── decorator_config.yaml             OAI-003, OAI-004
+├── mcp_safety.yaml                   OAI-106 (agent scope, MCP-gated)
 ├── network.yaml                      OAI-005
 ├── path_safety.yaml                  OAI-006
 ├── tool_definition.yaml              OAI-001, OAI-002

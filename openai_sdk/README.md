@@ -12,5 +12,6 @@ This pack is calibrated against the OpenAI Agents SDK as documented at the URL a
 - `decorator_config.yaml` — OAI-003 (strict_mode=False), OAI-004 (no failure_error_function)
 - `network.yaml` — OAI-005 (network call without timeout)
 - `path_safety.yaml` — OAI-006 (unsafe path in I/O)
-- `agent_safety.yaml` — OAI-101 (no input_guardrails + shell tools), OAI-102 (stop_on_first_tool), OAI-103 (loop pattern), OAI-104 (raw Agent + FS tools)
+- `agent_safety.yaml` — OAI-101 (no input_guardrails + shell tools), OAI-102 (stop_on_first_tool), OAI-103 (loop pattern), OAI-104 (raw Agent + FS tools), OAI-109 (WebSearchTool + no guardrails)
+- `mcp_safety.yaml` — OAI-106 (mcp_servers wired + no input_guardrails)
 - `tracing.yaml` — OAI-201 (default tracing in use)
