@@ -1,4 +1,4 @@
-# Policy index (auto generated)
+# Policy index
 
 All shipped rules across every SDK. ID prefix denotes SDK: `CSDK-` Claude
 Agent SDK, `OAI-` OpenAI Agents SDK, `ADK-` Google ADK. Within an SDK: `NNN`
