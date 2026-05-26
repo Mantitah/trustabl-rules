@@ -7,6 +7,25 @@ tool-scope, `1NN` agent / subagent scope, `2NN` repo scope.
 Risk score = `severity_weight × confidence × 100` (engine formula; weights:
 low=0.15, medium=0.40, high=0.70). Higher = worse.
 
+## Contributing a new policy
+
+Every policy in this index follows the same authoring template. The template
+lives at [docs/policy-rationale-doc-template-guide.md](docs/policy-rationale-doc-template-guide.md)
+and defines the rule YAML schema, the paired rationale doc at
+`docs/Policy/<category>/<topic>.md`, and the required sections (threat model,
+detection mechanics, references). Users can contribute their own policies by:
+
+1. Reading [CLAUDE.md](CLAUDE.md) for the rule-authoring contract (required
+   fields, per-scope `applies_to` values, ID conventions, severity guidance).
+2. Copying the template from
+   [docs/policy-rationale-doc-template-guide.md](docs/policy-rationale-doc-template-guide.md)
+   and filling every section.
+3. Adding the YAML rule under `<sdk_category>/<topic>.yaml` and the paired
+   rationale at `docs/Policy/<sdk_category>/<topic>.md`.
+4. Mirroring the rule into the engine repo's `testdata/rules-fixture/` with at
+   least one fire case and one silent case (see CLAUDE.md "Add a rule for X").
+5. Opening a PR — the rule appears here once merged.
+
 ## Totals
 
 | SDK                 | Tool   | Agent  | Subagent | Repo  | Total  | Per-SDK index                                              |
