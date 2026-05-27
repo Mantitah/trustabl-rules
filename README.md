@@ -37,9 +37,6 @@ schema field.
 
 ## Layout
 
-See [`POLICY_INDEX.md`](POLICY_INDEX.md) for the full per-SDK rule list
-(ID, title, scope, severity, source file).
-
 Rules are grouped by `<category>/<topic>.yaml`:
 
 ```
