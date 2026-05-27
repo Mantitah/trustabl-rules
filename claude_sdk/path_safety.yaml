@@ -10,12 +10,12 @@ policy:
 rules:
   - id: CSDK-004
     title: Path parameter used in I/O without validation
-    scope: tool
     severity: high
     confidence: 0.7
     language: python
     applies_to:
       - claude_sdk_tool
+    scope: tool
     # call_uses_unnormalized_path_param is per-param: a tool with two path
     # params and one .resolve() correctly fires on the unresolved one.
     # A body-wide check would suppress the rule whenever any normalization

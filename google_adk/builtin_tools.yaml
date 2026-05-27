@@ -10,11 +10,12 @@ policy:
 rules:
   - id: ADK-008
     title: BashTool missing shell metacharacter blocking
-    scope: tool
     severity: high
     confidence: 0.9
     language: python
-    applies_to: [adk_function_tool]
+    applies_to:
+      - adk_function_tool
+    scope: tool
     match:
       all:
         - name_in:
@@ -34,5 +35,3 @@ rules:
       Pass block_shell_metacharacters=True to the BashTool constructor. If the
       tool legitimately needs metacharacters for a specific use case, document
       the threat model and pair it with an explicit command allowlist.
-    references:
-      - "OWASP LLM Top 10:2025 LLM01 Prompt Injection — https://genai.owasp.org/llmrisk/llm01-prompt-injection/"

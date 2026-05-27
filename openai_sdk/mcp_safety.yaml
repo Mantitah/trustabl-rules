@@ -11,13 +11,13 @@ policy:
 rules:
   - id: OAI-106
     title: Agent wires MCP servers without input_guardrails
-    scope: agent
     severity: high
     confidence: 0.9
     language: python
     applies_to:
       - openai_agent
       - openai_sandbox_agent
+    scope: agent
     match:
       all:
         - agent_kwarg_present: [mcp_servers]

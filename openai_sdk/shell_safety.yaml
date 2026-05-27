@@ -11,12 +11,12 @@ policy:
 rules:
   - id: OAI-012
     title: Tool body spawns a subprocess
-    scope: tool
     severity: high
     confidence: 0.9
     language: python
     applies_to:
       - openai_tool
+    scope: tool
     match:
       has_body_text:
         - subprocess.run(
@@ -44,5 +44,3 @@ rules:
       and run the agent under a sandbox (container, seccomp profile, or
       restricted-user namespace). Confine the working directory and drop
       env vars the tool does not need.
-    references:
-      - "OWASP LLM Top 10:2025 LLM06 Excessive Agency — https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"

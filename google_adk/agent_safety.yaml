@@ -10,11 +10,12 @@ policy:
 rules:
   - id: ADK-101
     title: LlmAgent has no description
-    scope: agent
     severity: medium
     confidence: 0.85
     language: python
-    applies_to: [adk_llm_agent]
+    applies_to:
+      - adk_llm_agent
+    scope: agent
     match:
       all:
         - agent_class: [LlmAgent]
@@ -34,11 +35,12 @@ rules:
 
   - id: ADK-102
     title: Agent with BashTool has no before_tool_callback
-    scope: agent
     severity: high
     confidence: 0.85
     language: python
-    applies_to: [adk_llm_agent]
+    applies_to:
+      - adk_llm_agent
+    scope: agent
     match:
       all:
         - agent_class: [LlmAgent]
@@ -62,11 +64,12 @@ rules:
 
   - id: ADK-103
     title: Sub-agent is granted BashTool
-    scope: agent
     severity: high
     confidence: 0.9
     language: python
-    applies_to: [adk_llm_agent]
+    applies_to:
+      - adk_llm_agent
+    scope: agent
     match:
       all:
         - agent_is_subagent_of_any: true
@@ -87,11 +90,12 @@ rules:
 
   - id: ADK-104
     title: Agent has no safety_settings
-    scope: agent
     severity: medium
     confidence: 0.75
     language: python
-    applies_to: [adk_llm_agent]
+    applies_to:
+      - adk_llm_agent
+    scope: agent
     match:
       all:
         - agent_class: [LlmAgent]
@@ -108,19 +112,15 @@ rules:
       HarmBlockThreshold values for each HarmCategory your use case requires.
       At minimum set DANGEROUS_CONTENT to BLOCK_LOW_AND_ABOVE for agents that
       touch external data or execute tools with side effects.
-    fix_hints:
-      guard: safety_settings_required
-    references:
-      - "OWASP LLM Top 10:2025 LLM06 Excessive Agency — https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
-      - "OWASP LLM Top 10:2025 LLM05 Improper Output Handling — https://genai.owasp.org/llmrisk/llm052025-improper-output-handling/"
 
   - id: ADK-105
     title: Agent uses web search built-in without before_tool_callback
-    scope: agent
     severity: high
     confidence: 0.85
     language: python
-    applies_to: [adk_llm_agent]
+    applies_to:
+      - adk_llm_agent
+    scope: agent
     match:
       all:
         - agent_class: [LlmAgent]
@@ -140,9 +140,3 @@ rules:
       search query conforms to expected patterns and return a dict with an
       "error" key to block suspicious calls. Pair this with safety_settings= to
       filter harmful model outputs from processing search content.
-    fix_hints:
-      hook: before_tool_callback
-      guard: query_allowlist
-    references:
-      - "OWASP LLM Top 10:2025 LLM01 Prompt Injection — https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
-      - "OWASP LLM Top 10:2025 LLM06 Excessive Agency — https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"

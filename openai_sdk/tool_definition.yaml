@@ -10,12 +10,12 @@ policy:
 rules:
   - id: OAI-001
     title: Tool function has no docstring
-    scope: tool
     severity: low
     confidence: 0.9
     language: python
     applies_to:
       - openai_tool
+    scope: tool
     match:
       has_docstring: false
     explanation: >
@@ -30,12 +30,12 @@ rules:
 
   - id: OAI-002
     title: Tool function has no type-annotated parameters
-    scope: tool
     severity: medium
     confidence: 0.85
     language: python
     applies_to:
       - openai_tool
+    scope: tool
     match:
       has_params: true
       has_typed_params: false
@@ -50,12 +50,12 @@ rules:
 
   - id: OAI-007
     title: Ambiguous tool name
-    scope: tool
     severity: low
     confidence: 0.9
     language: python
     applies_to:
       - openai_tool
+    scope: tool
     match:
       name_in:
         - process
@@ -74,5 +74,3 @@ rules:
       refuse to call it at all when a better-named alternative is present.
     fix: >
       Rename to a verb-object form, e.g. `summarize_invoice`, `fetch_weather`.
-    references:
-      - "OWASP LLM Top 10:2025 LLM06 Excessive Agency — https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"

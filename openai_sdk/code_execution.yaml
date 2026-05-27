@@ -10,12 +10,12 @@ policy:
 rules:
   - id: OAI-013
     title: Tool body calls eval/exec/compile on dynamic input
-    scope: tool
     severity: high
     confidence: 0.9
     language: python
     applies_to:
       - openai_tool
+    scope: tool
     match:
       has_body_text:
         - exec(
@@ -39,6 +39,3 @@ rules:
       surface (e.g. notebook-style), run the exec inside a separate process
       with seccomp + no network + no filesystem write, and treat the process
       as a single-use sacrificial sandbox.
-    references:
-      - "OWASP LLM Top 10:2025 LLM05 Improper Output Handling — https://genai.owasp.org/llmrisk/llm052025-improper-output-handling/"
-      - "OWASP LLM Top 10:2025 LLM06 Excessive Agency — https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"

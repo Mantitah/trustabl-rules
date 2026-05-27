@@ -9,12 +9,12 @@ policy:
 rules:
   - id: OAI-005
     title: Network call has no timeout
-    scope: tool
     severity: high
     confidence: 0.85
     language: python
     applies_to:
       - openai_tool
+    scope: tool
     match:
       call_without_kwarg:
         callees:
@@ -39,17 +39,15 @@ rules:
       Pass timeout= (typically 5-30 seconds depending on the endpoint).
       Surface timeouts as a structured tool error the model can react to,
       using failure_error_function (see OAI-004).
-    references:
-      - "OWASP LLM Top 10:2025 LLM10 Unbounded Consumption — https://genai.owasp.org/llmrisk/llm102025-unbounded-consumption/"
 
   - id: OAI-011
     title: urllib network call has no timeout
-    scope: tool
     severity: high
     confidence: 0.85
     language: python
     applies_to:
       - openai_tool
+    scope: tool
     match:
       call_without_kwarg:
         callees:
@@ -69,5 +67,3 @@ rules:
       every urllib.request.urlopen call. Surface timeouts as a structured
       tool error the model can react to using failure_error_function (see
       OAI-004). OAI-005 covers the equivalent gap for requests/httpx callees.
-    references:
-      - "OWASP LLM Top 10:2025 LLM10 Unbounded Consumption — https://genai.owasp.org/llmrisk/llm102025-unbounded-consumption/"

@@ -10,12 +10,12 @@ policy:
 rules:
   - id: OAI-009
     title: Mutating tool has no idempotency key
-    scope: tool
     severity: medium
     confidence: 0.55
     language: python
     applies_to:
       - openai_tool
+    scope: tool
     match:
       all:
         - name_has_prefix:
@@ -41,8 +41,3 @@ rules:
       must also honor the key for this protection to be effective.
     fix: >
       Add an `idempotency_key: str` parameter and pass it to the backing API.
-    fix_hints:
-      hook: pretooluse_validate
-      inject_idempotency: true
-    references:
-      - "OWASP LLM Top 10:2025 LLM06 Excessive Agency — https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"

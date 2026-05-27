@@ -11,12 +11,12 @@ policy:
 rules:
   - id: CSDK-101
     title: Claude subagent is granted the Bash tool
-    scope: agent
     severity: high
     confidence: 0.8
     language: python
     applies_to:
       - claude_agent_definition
+    scope: agent
     match:
       agent_grants_builtin_tool:
         - Bash
@@ -37,12 +37,12 @@ rules:
 
   - id: CSDK-102
     title: Claude subagent is granted the WebSearch tool
-    scope: agent
     severity: high
     confidence: 0.8
     language: python
     applies_to:
       - claude_agent_definition
+    scope: agent
     match:
       agent_uses_hosted_tool_class:
         - WebSearch
@@ -60,9 +60,3 @@ rules:
       PreToolUse hook that validates the search query before it executes, and
       ensure the lead agent that dispatches this subagent validates task
       descriptions before passing them down.
-    fix_hints:
-      hook: pretooluse_validate
-      guard: query_allowlist
-    references:
-      - "OWASP LLM Top 10:2025 LLM01 Prompt Injection — https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
-      - "OWASP LLM Top 10:2025 LLM06 Excessive Agency — https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"

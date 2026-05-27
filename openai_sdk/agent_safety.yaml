@@ -10,13 +10,13 @@ policy:
 rules:
   - id: OAI-101
     title: Agent has no input_guardrails AND wires shell or filesystem-touching tools
-    scope: agent
     severity: high
     confidence: 0.85
     language: python
     applies_to:
       - openai_agent
       - openai_sandbox_agent
+    scope: agent
     match:
       all:
         - agent_kwarg_list_empty: [input_guardrails]
@@ -35,13 +35,13 @@ rules:
 
   - id: OAI-102
     title: Agent uses tool_use_behavior="stop_on_first_tool"
-    scope: agent
     severity: high
     confidence: 0.95
     language: python
     applies_to:
       - openai_agent
       - openai_sandbox_agent
+    scope: agent
     match:
       agent_kwarg_value:
         kwarg: tool_use_behavior
@@ -60,13 +60,13 @@ rules:
 
   - id: OAI-103
     title: tool_choice="required" combined with reset_tool_choice=False
-    scope: agent
     severity: high
     confidence: 0.95
     language: python
     applies_to:
       - openai_agent
       - openai_sandbox_agent
+    scope: agent
     match:
       all:
         - agent_kwarg_value:
@@ -88,12 +88,12 @@ rules:
 
   - id: OAI-104
     title: Raw Agent (not SandboxAgent) wires shell or filesystem-touching tools
-    scope: agent
     severity: medium
     confidence: 0.75
     language: python
     applies_to:
       - openai_agent
+    scope: agent
     match:
       all:
         - agent_class: [Agent]
@@ -111,13 +111,13 @@ rules:
 
   - id: OAI-109
     title: Agent uses WebSearchTool without input_guardrails
-    scope: agent
     severity: high
     confidence: 0.85
     language: python
     applies_to:
       - openai_agent
       - openai_sandbox_agent
+    scope: agent
     match:
       all:
         - agent_uses_hosted_tool_class: [WebSearchTool]
@@ -136,6 +136,3 @@ rules:
       to attacker-controlled content (e.g. queries containing raw URLs or
       suspicious redirection patterns). Wire it via input_guardrails=[...] on
       the Agent(...) constructor.
-    references:
-      - "OWASP LLM Top 10:2025 LLM01 Prompt Injection — https://genai.owasp.org/llmrisk/llm01-prompt-injection/"
-      - "OWASP LLM Top 10:2025 LLM06 Excessive Agency — https://genai.owasp.org/llmrisk/llm062025-excessive-agency/"
