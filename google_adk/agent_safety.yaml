@@ -124,7 +124,7 @@ rules:
     match:
       all:
         - agent_class: [LlmAgent]
-        - agent_uses_hosted_tool_class: [google_search, VertexAISearch]
+        - agent_uses_hosted_tool_class: [GoogleSearchTool, VertexAiSearchTool]
         - agent_kwarg_missing: [before_tool_callback]
     explanation: >
       This LlmAgent is wired with a web search built-in (google_search or
