@@ -1,0 +1,95 @@
+policy:
+  id: openai_sdk_approvals
+  name: OpenAI Agents SDK tool approval gates
+  category: openai_sdk
+  description: >
+    Rules covering the human-in-the-loop approval gate the OpenAI Agents SDK
+    offers on sensitive tool calls. The SDK exposes needs_approval on
+    @function_tool (and on hosted tools); its default is False everywhere, so a
+    privileged tool ships un-gated unless the author opts in.
+
+rules:
+  - id: OAI-014
+    title: Privileged tool has no needs_approval gate
+    severity: high
+    confidence: 0.7
+    language: python
+    applies_to:
+      - openai_tool
+    scope: tool
+    match:
+      all:
+        - any:
+            - has_shell_call: true
+            - has_code_exec_call: true
+            - has_write_call: true
+        - not:
+            tool_decorator_kwarg_present:
+              - needs_approval
+    explanation: >
+      This @function_tool shells out, executes dynamic code, or writes the
+      filesystem, but sets no needs_approval kwarg. needs_approval is the OpenAI
+      Agents SDK's documented human-in-the-loop gate for sensitive tool calls,
+      and its default is False — so an un-gated privileged tool executes
+      attacker-influenced model output with no human checkpoint. This complements
+      OAI-012 (subprocess) and OAI-013 (eval/exec): those flag the dangerous
+      call; OAI-014 flags the missing approval gate around it.
+    fix: >
+      Pass needs_approval=True to the @function_tool decorator for tools that
+      execute commands, run code, or mutate the filesystem, and handle the
+      resulting approval items in your run loop. If approval is intentionally
+      automated for a trusted tool, gate the tool at the agent level
+      (input_guardrails) instead and document the decision.
+
+  - id: OAI-111
+    title: Agent wires a privileged hosted tool without needs_approval
+    severity: high
+    confidence: 0.75
+    language: python
+    applies_to:
+      - openai_agent
+      - openai_sandbox_agent
+    scope: agent
+    match:
+      any:
+        - all:
+            - agent_uses_hosted_tool_class: [ShellTool]
+            - not:
+                agent_hosted_tool_kwarg_value:
+                  class: ShellTool
+                  kwarg: needs_approval
+                  value: "True"
+        - all:
+            - agent_uses_hosted_tool_class: [LocalShellTool]
+            - not:
+                agent_hosted_tool_kwarg_value:
+                  class: LocalShellTool
+                  kwarg: needs_approval
+                  value: "True"
+        - all:
+            - agent_uses_hosted_tool_class: [CodeInterpreterTool]
+            - not:
+                agent_hosted_tool_kwarg_value:
+                  class: CodeInterpreterTool
+                  kwarg: needs_approval
+                  value: "True"
+        - all:
+            - agent_uses_hosted_tool_class: [ApplyPatchTool]
+            - not:
+                agent_hosted_tool_kwarg_value:
+                  class: ApplyPatchTool
+                  kwarg: needs_approval
+                  value: "True"
+    explanation: >
+      This agent wires a privileged hosted tool — ShellTool or LocalShellTool
+      (run shell commands), CodeInterpreterTool (run code), or ApplyPatchTool
+      (edit files) — without setting needs_approval=True on it. needs_approval
+      defaults to False on these tools, so without an explicit opt-in the model
+      executes commands, code, or file edits with no human checkpoint.
+      needs_approval is the SDK's human-in-the-loop gate for exactly this class
+      of tool.
+    fix: >
+      Construct the privileged tool with needs_approval=True and handle the
+      resulting approval items in your run loop, or wrap the agent with
+      input_guardrails that screen what can reach it. Prefer SandboxAgent to
+      confine what the tool can do.

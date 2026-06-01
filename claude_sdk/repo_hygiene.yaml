@@ -9,7 +9,7 @@ policy:
     start.
 
 rules:
-  - id: CSDK-201
+  - id: CSDK-203
     title: Repo ships Claude Agent SDK code without a CLAUDE.md
     severity: low
     confidence: 0.9
