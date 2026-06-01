@@ -41,36 +41,46 @@ Rules are grouped by `<category>/<topic>.yaml`:
 
 ```
 manifest.yaml                         schema_version (metadata, not a rule)
-claude_sdk/                           Claude Agent SDK rules (CSDK-NNN)
-├── agent_safety.yaml                 CSDK-101, CSDK-102 (agent scope)
+claude_sdk/                           Claude Agent SDK rules (CSDK-NNN) — 20 rules
+├── agent_safety.yaml                 CSDK-101..105 (agent scope)
+├── code_execution.yaml               CSDK-107
 ├── error_handling.yaml               CSDK-005
 ├── idempotency.yaml                  CSDK-006
 ├── network.yaml                      CSDK-003
 ├── path_safety.yaml                  CSDK-004
-├── subagent_safety.yaml              CSDK-110 (subagent scope)
-└── tool_definition.yaml              CSDK-001, CSDK-002, CSDK-007
-openai_sdk/                           OpenAI Agents SDK rules (OAI-NNN)
-├── agent_safety.yaml                 OAI-101..104, OAI-109 (agent scope)
-├── code_execution.yaml               OAI-013
-├── decorator_config.yaml             OAI-003, OAI-004
+├── repo.yaml                         CSDK-201, CSDK-202 (repo scope, permission bypass)
+├── repo_hygiene.yaml                 CSDK-203 (repo scope, CLAUDE.md missing)
+├── shell_safety.yaml                 CSDK-108
+├── subagent_safety.yaml              CSDK-110, CSDK-111 (subagent scope)
+└── tool_definition.yaml              CSDK-001, CSDK-002, CSDK-007, CSDK-008
+openai_sdk/                           OpenAI Agents SDK rules (OAI-NNN) — 29 rules
+├── agent_safety.yaml                 OAI-101..104, OAI-109, OAI-110 (agent scope)
+├── approvals.yaml                    OAI-014, OAI-111 (needs_approval gates)
+├── code_execution.yaml               OAI-013 (python), OAI-017 (typescript)
+├── decorator_config.yaml             OAI-003, OAI-004, OAI-015
 ├── error_handling.yaml               OAI-008
-├── idempotency.yaml                  OAI-009
+├── idempotency.yaml                  OAI-009 (python), OAI-019 (typescript)
 ├── mcp_safety.yaml                   OAI-106 (agent scope, MCP-gated)
-├── network.yaml                      OAI-005, OAI-011
+├── network.yaml                      OAI-005, OAI-011, OAI-016 (typescript), OAI-018
 ├── observability.yaml                OAI-010
 ├── path_safety.yaml                  OAI-006
+├── repo_hygiene.yaml                 OAI-202 (repo scope, CLAUDE.md missing)
 ├── shell_safety.yaml                 OAI-012
 ├── tool_definition.yaml              OAI-001, OAI-002, OAI-007
 └── tracing.yaml                      OAI-201 (repo scope)
-google_adk/                           Google ADK rules (ADK-NNN)
-├── agent_safety.yaml                 ADK-101..105 (agent scope)
-├── builtin_tools.yaml                ADK-008
+google_adk/                           Google ADK rules (ADK-NNN) — 19 rules
+├── agent_safety.yaml                 ADK-101..108, ADK-110 (agent scope)
+├── builtin_tools.yaml                ADK-008 (BashTool policy gate, agent scope)
 ├── error_handling.yaml               ADK-005
 ├── idempotency.yaml                  ADK-006
 ├── network.yaml                      ADK-003
 ├── path_safety.yaml                  ADK-004
-└── tool_definition.yaml              ADK-001, ADK-002, ADK-007
+├── repo_hygiene.yaml                 ADK-201 (repo scope, CLAUDE.md missing)
+└── tool_definition.yaml              ADK-001, ADK-002, ADK-007, ADK-009
 ```
+
+Total: 68 rules across 33 yaml files. ID prefix denotes SDK; `NNN` tool scope,
+`1NN` agent / subagent scope, `2NN` repo scope.
 
 The category is the first path segment. Group related rules into a topic file;
 1–5 rules per file reads best. The loader walks recursively, so a new category
