@@ -41,45 +41,49 @@ Rules are grouped by `<category>/<topic>.yaml`:
 
 ```
 manifest.yaml                         schema_version (metadata, not a rule)
-claude_sdk/                           Claude Agent SDK rules (CSDK-NNN) — 20 rules
-├── agent_safety.yaml                 CSDK-101..105 (agent scope)
-├── code_execution.yaml               CSDK-107
+claude_sdk/                           Claude Agent SDK rules (CSDK-NNN) — 30 rules
+├── agent_safety.yaml                 CSDK-101..105 (agent); CSDK-120/130/131 (agent: permissionMode bypass + query() main-thread grants)
+├── code_execution.yaml               CSDK-107 (python), CSDK-011 (typescript)
 ├── error_handling.yaml               CSDK-005
-├── idempotency.yaml                  CSDK-006
+├── idempotency.yaml                  CSDK-006 (python), CSDK-016 (typescript)
 ├── network.yaml                      CSDK-003
-├── path_safety.yaml                  CSDK-004
+├── path_safety.yaml                  CSDK-004 (python), CSDK-012 (typescript fs-write)
 ├── repo.yaml                         CSDK-201, CSDK-202 (repo scope, permission bypass)
 ├── repo_hygiene.yaml                 CSDK-203 (repo scope, CLAUDE.md missing)
-├── shell_safety.yaml                 CSDK-108
+├── shell_safety.yaml                 CSDK-108 (python), CSDK-010 (typescript)
+├── ssrf.yaml                         CSDK-009 (python), CSDK-013 (typescript)
 ├── subagent_safety.yaml              CSDK-110, CSDK-111 (subagent scope)
-└── tool_definition.yaml              CSDK-001, CSDK-002, CSDK-007, CSDK-008
-openai_sdk/                           OpenAI Agents SDK rules (OAI-NNN) — 29 rules
-├── agent_safety.yaml                 OAI-101..104, OAI-109, OAI-110 (agent scope)
+└── tool_definition.yaml              CSDK-001, CSDK-002, CSDK-007, CSDK-008 (python), CSDK-014 (typescript)
+openai_sdk/                           OpenAI Agents SDK rules (OAI-NNN) — 32 rules
+├── agent_safety.yaml                 OAI-101..104, OAI-109, OAI-110 (agent); OAI-105 (agent, typescript)
 ├── approvals.yaml                    OAI-014, OAI-111 (needs_approval gates)
 ├── code_execution.yaml               OAI-013 (python), OAI-017 (typescript)
 ├── decorator_config.yaml             OAI-003, OAI-004, OAI-015
 ├── error_handling.yaml               OAI-008
 ├── idempotency.yaml                  OAI-009 (python), OAI-019 (typescript)
 ├── mcp_safety.yaml                   OAI-106 (agent scope, MCP-gated)
-├── network.yaml                      OAI-005, OAI-011, OAI-016 (typescript), OAI-018
+├── network.yaml                      OAI-005, OAI-011, OAI-018 (python); OAI-016, OAI-024 (typescript)
 ├── observability.yaml                OAI-010
 ├── path_safety.yaml                  OAI-006
 ├── repo_hygiene.yaml                 OAI-202 (repo scope, CLAUDE.md missing)
 ├── shell_safety.yaml                 OAI-012
-├── tool_definition.yaml              OAI-001, OAI-002, OAI-007
+├── tool_definition.yaml              OAI-001, OAI-002, OAI-007 (python), OAI-022 (typescript)
 └── tracing.yaml                      OAI-201 (repo scope)
-google_adk/                           Google ADK rules (ADK-NNN) — 19 rules
-├── agent_safety.yaml                 ADK-101..108, ADK-110 (agent scope)
+google_adk/                           Google ADK rules (ADK-NNN) — 26 rules
+├── agent_safety.yaml                 ADK-101..108, ADK-110 (agent); ADK-109 (agent, typescript)
 ├── builtin_tools.yaml                ADK-008 (BashTool policy gate, agent scope)
+├── code_execution.yaml               ADK-011 (python), ADK-015 (typescript)
 ├── error_handling.yaml               ADK-005
 ├── idempotency.yaml                  ADK-006
 ├── network.yaml                      ADK-003
 ├── path_safety.yaml                  ADK-004
 ├── repo_hygiene.yaml                 ADK-201 (repo scope, CLAUDE.md missing)
-└── tool_definition.yaml              ADK-001, ADK-002, ADK-007, ADK-009
+├── shell_safety.yaml                 ADK-010
+├── ssrf.yaml                         ADK-012 (python), ADK-016 (typescript)
+└── tool_definition.yaml              ADK-001, ADK-002, ADK-007, ADK-009 (python), ADK-013 (typescript)
 ```
 
-Total: 68 rules across 33 yaml files. ID prefix denotes SDK; `NNN` tool scope,
+Total: 88 rules across 37 yaml files. ID prefix denotes SDK; `NNN` tool scope,
 `1NN` agent / subagent scope, `2NN` repo scope.
 
 The category is the first path segment. Group related rules into a topic file;
