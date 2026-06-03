@@ -142,3 +142,32 @@ rules:
       essential. If it is essential, gate it with a PreToolUse hook that
       allowlists permitted hosts/URLs and blocks internal address ranges, and
       validate the task descriptions the lead agent passes down.
+
+  - id: CSDK-120
+    title: TypeScript AgentDefinition sets permissionMode to bypassPermissions
+    severity: high
+    confidence: 0.9
+    language: typescript
+    applies_to:
+      - claude_agent_definition
+    scope: agent
+    match:
+      agent_kwarg_value:
+        kwarg: permissionMode
+        value: bypassPermissions
+    explanation: >
+      This TypeScript AgentDefinition sets permissionMode: "bypassPermissions",
+      which disables the SDK's interactive approval gate for every tool the agent
+      runs. Agents are dispatched autonomously in response to model-generated task
+      descriptions, so a prompt-injected or mis-scoped task reaches the agent's
+      tools — including Bash, Write, and Edit — with no human in the loop and no
+      per-call confirmation. This is the single highest-impact Claude-specific
+      misconfiguration: it removes the one control that stands between model output
+      and real side effects.
+    fix: >
+      Remove permissionMode: "bypassPermissions" unless this agent runs in a
+      fully sandboxed, non-interactive context you control (e.g. CI with no
+      secrets or network). If autonomous operation is required, pass
+      allowedTools or disallowedTools in the AgentDefinition constructor to
+      restrict the tool surface, and prefer a safe default permission mode
+      ("default" or "acceptEdits") scoped to a minimal tool set.
