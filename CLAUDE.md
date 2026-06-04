@@ -84,6 +84,7 @@ against. Pick values from the table for the scope you're targeting.
 | `openai_agent`            | `Agent(...)` from `openai-agents` SDK                         |
 | `openai_sandbox_agent`    | `SandboxAgent(...)` from `openai-agents` SDK                  |
 | `claude_agent_definition` | `AgentDefinition(...)` from `claude-agent-sdk`                |
+| `claude_query_main`       | `query(...)` main-thread agent from the Claude TS SDK         |
 | `adk_llm_agent`           | `LlmAgent(...)` / `Agent(...)` alias from `google-adk`        |
 | `adk_sequential_agent`    | `SequentialAgent(...)` from `google-adk`                      |
 | `adk_parallel_agent`      | `ParallelAgent(...)` from `google-adk`                        |
