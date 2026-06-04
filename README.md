@@ -81,9 +81,18 @@ google_adk/                           Google ADK rules (ADK-NNN) — 26 rules
 ├── shell_safety.yaml                 ADK-010
 ├── ssrf.yaml                         ADK-012 (python), ADK-016 (typescript)
 └── tool_definition.yaml              ADK-001, ADK-002, ADK-007, ADK-009 (python), ADK-013 (typescript)
+mcp/                                  Model Context Protocol rules (MCP-NNN) — 14 rules
+├── code_execution.yaml               MCP-009, MCP-014
+├── error_handling.yaml               MCP-006
+├── idempotency.yaml                  MCP-007
+├── network.yaml                      MCP-004
+├── path_safety.yaml                  MCP-005
+├── shell_safety.yaml                 MCP-010, MCP-012
+├── ssrf.yaml                         MCP-008, MCP-013
+└── tool_definition.yaml              MCP-001, MCP-002, MCP-003, MCP-011
 ```
 
-Total: 88 rules across 37 yaml files. ID prefix denotes SDK; `NNN` tool scope,
+Total: 102 rules across 45 yaml files. ID prefix denotes SDK; `NNN` tool scope,
 `1NN` agent / subagent scope, `2NN` repo scope.
 
 The category is the first path segment. Group related rules into a topic file;
