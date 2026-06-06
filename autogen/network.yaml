@@ -10,8 +10,8 @@ policy:
 rules:
   - id: AG2-012
     title: AutoGen tool network call has no timeout
-    severity: high
-    confidence: 0.85
+    severity: medium
+    confidence: 0.8
     language: python
     applies_to:
       - autogen_tool
