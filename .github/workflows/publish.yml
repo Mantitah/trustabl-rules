@@ -66,6 +66,12 @@ jobs:
   # No channel re-point happens here.
   build:
     runs-on: ubuntu-latest
+    # The signing key is a `production` ENVIRONMENT secret, and environment secrets
+    # are only readable by a job that declares the environment — so the job that
+    # SIGNS must be the gated one. Declaring it here makes the whole signed publish
+    # wait for the required-reviewer approval before anything is signed or released
+    # (the self-verify still hard-blocks promoting a bad statement).
+    environment: production
     outputs:
       digest: ${{ steps.bundle.outputs.digest }}
     steps:
@@ -185,13 +191,13 @@ jobs:
           path: ${{ runner.temp }}/statement.json
           retention-days: 7
 
-  # Re-point the channel release to the new statement. Gated behind the
-  # `production` environment so it requires manual approval — build/sign/verify
-  # happen above without auto-promoting.
+  # Re-point the channel release to the new statement. The approval gate is on the
+  # `build` job (which holds the signing secret); promote only runs after that
+  # gated, self-verified build succeeds, so the re-point is already behind the
+  # required-reviewer approval and needs no second gate here.
   promote:
     needs: build
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - name: Download statement
         uses: actions/download-artifact@v4
