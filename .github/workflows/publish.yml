@@ -144,8 +144,9 @@ jobs:
             echo "bundle release $tag already exists - skipping (content-addressed)."
           elif gh release create "$tag" "$RUNNER_TEMP/bundle.tar.gz#bundle.tar.gz" \
               -R "${{ github.repository }}" \
-              --title "Rules bundle ${{ steps.bundle.outputs.digest }}" \
-              --notes "Immutable content-addressed rule bundle. Committed by a signed channel statement."; then
+              --title "Rules bundle ${{ steps.bundle.outputs.digest }} (content-addressed)" \
+              --notes "Immutable content-addressed rule bundle. Committed by a signed channel statement. Auto-managed; not a downloadable release." \
+              --prerelease --latest=false; then
             echo "created bundle release $tag."
           elif gh release view "$tag" -R "${{ github.repository }}" >/dev/null 2>&1; then
             # Lost a create race with a concurrent run; content is identical
@@ -218,8 +219,9 @@ jobs:
             # to clobber-upload so the channel ends up pointed at this statement.
             gh release create "$tag" "stmt/statement.json#statement.json" \
               -R "${{ github.repository }}" \
-              --title "Channel: $CHANNEL" \
-              --notes "Signed pointer to the current bundle for the $CHANNEL channel." \
+              --title "Signed rules channel: $CHANNEL (auto-managed)" \
+              --notes "Signed pointer to the current bundle for the $CHANNEL channel. Auto-managed; fetched by the scanner, not a downloadable release." \
+              --prerelease --latest=false \
               || gh release upload "$tag" "stmt/statement.json" --clobber -R "${{ github.repository }}"
           fi
           echo "promoted $CHANNEL -> bundle ${{ needs.build.outputs.digest }}"
