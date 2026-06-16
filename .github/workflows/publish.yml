@@ -1,0 +1,203 @@
+name: Publish signed channel
+
+# The signing/publishing counterpart to validate.yml. It builds a canonical rule
+# bundle, signs a channel statement the Trustabl engine will verify, publishes an
+# immutable bundle-<digest> release, and (behind a gated environment) re-points
+# the channel-<name> release the engine resolves at scan time.
+#
+# Producer/verifier contract — both sides share one implementation so the digest
+# and signature can never drift:
+#   bundle:    `rulesctl bundle` == engine rulesign.WriteCanonicalTar / CanonicalDigest
+#   statement: `rulesctl sign`   == engine rulesign.StatementSigningPayload
+#   layout:    bundle-<digest>/bundle.tar.gz, channel-<name>/statement.json
+#              (engine internal/rulesource/githubtransport.go)
+#
+# PREREQUISITES before this can promote successfully (the chicken-and-egg the
+# rollout is sequenced around — see the engine's cutover plan):
+#   1. RULES_SIGNING_KEY_ED25519 secret set (base64 32-byte seed from
+#      `rulesctl keygen`), ideally as a *production environment* secret.
+#   2. The engine at `engine_ref` embeds the matching PUBLIC key in
+#      internal/rulesign/keyring.json (else the self-verify step fails closed,
+#      which correctly blocks promotion).
+#   3. A GitHub Environment named `production` with required reviewers (gates the
+#      promote job below).
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "Signed channel to publish (e.g. production, staging)"
+        required: true
+        default: staging
+      ttl_hours:
+        description: "Statement freshness window in hours"
+        required: true
+        default: "720"
+      engine_ref:
+        description: "trustabl engine ref to build rulesctl/trustabl from (must embed the public keyring)"
+        required: true
+        default: main
+
+# tree-sitter is a C library, so building the engine binaries needs cgo.
+env:
+  CGO_ENABLED: "1"
+  GH_TOKEN: ${{ github.token }}
+  # Signing key id. NOT secret — it is the public `id` in the engine's embedded
+  # keyring.json and must match it exactly. Kept here (not a repo variable) so the
+  # GitHub side needs only the one signing secret; on rotation, bump this in
+  # lockstep with keyring.json and the engine build.
+  RULES_SIGNING_KEY_ID: trustabl-rules-2026-06
+
+permissions:
+  contents: write # create/upload releases
+
+# Serialize publishes per channel so two overlapping dispatches cannot race the
+# bundle/channel release creates. Do not cancel an in-flight publish midway.
+concurrency:
+  group: publish-${{ github.event.inputs.channel }}
+  cancel-in-progress: false
+
+jobs:
+  # Build the candidate bundle + statement and prove the engine can verify them
+  # against the live releases. No channel re-point happens here.
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.bundle.outputs.digest }}
+    steps:
+      - name: Checkout rules
+        uses: actions/checkout@v4
+        with:
+          path: rules
+
+      - name: Checkout engine
+        uses: actions/checkout@v4
+        with:
+          repository: trustabl/trustabl
+          ref: ${{ inputs.engine_ref }}
+          path: engine
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: engine/go.mod
+          cache: true
+          cache-dependency-path: engine/go.sum
+
+      - name: Build publisher + scanner
+        working-directory: engine
+        run: |
+          go build -o "$RUNNER_TEMP/rulesctl" ./cmd/rulesctl
+          go build -o "$RUNNER_TEMP/trustabl" ./cmd/trustabl
+
+      # Clean export: manifest.yaml + the rule-pack dirs only. Anything else
+      # (.git, .github, docs, top-level markdown, LICENSE) would change the
+      # content digest without being a rule, so it is excluded.
+      - name: Assemble bundle source
+        run: |
+          mkdir -p export
+          rsync -a \
+            --exclude='.git' --exclude='.github' --exclude='docs' \
+            --exclude='*.md' --exclude='LICENSE' \
+            rules/ export/
+          test -f export/manifest.yaml || { echo "manifest.yaml missing from export"; exit 1; }
+
+      - name: Bundle + digest
+        id: bundle
+        run: |
+          digest="$("$RUNNER_TEMP/rulesctl" bundle export --out "$RUNNER_TEMP/bundle.tar.gz")"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "bundle digest: $digest"
+
+      # Immutable, content-addressed bundle release. Idempotent: the same rules
+      # produce the same digest, so a re-run with unchanged rules is a no-op.
+      - name: Publish bundle release
+        run: |
+          tag="bundle-${{ steps.bundle.outputs.digest }}"
+          if gh release view "$tag" -R "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "bundle release $tag already exists — skipping (content-addressed)."
+          elif gh release create "$tag" "$RUNNER_TEMP/bundle.tar.gz#bundle.tar.gz" \
+              -R "${{ github.repository }}" \
+              --title "Rules bundle ${{ steps.bundle.outputs.digest }}" \
+              --notes "Immutable content-addressed rule bundle. Committed by a signed channel statement."; then
+            echo "created bundle release $tag."
+          elif gh release view "$tag" -R "${{ github.repository }}" >/dev/null 2>&1; then
+            # Lost a create race with a concurrent run; the content is identical
+            # (content-addressed), so an existing tag is success, not failure.
+            echo "bundle release $tag created concurrently — ok."
+          else
+            echo "failed to create bundle release $tag"; exit 1
+          fi
+
+      # Sign over the digest. version defaults to epoch seconds (monotonic per
+      # channel across sequential publishes); expires = now + ttl_hours.
+      - name: Sign channel statement
+        env:
+          RULES_SIGNING_KEY_ED25519: ${{ secrets.RULES_SIGNING_KEY_ED25519 }}
+        run: |
+          test -n "$RULES_SIGNING_KEY_ED25519" || { echo "RULES_SIGNING_KEY_ED25519 secret not set"; exit 1; }
+          ttl="${{ inputs.ttl_hours }}h"
+          "$RUNNER_TEMP/trustabl" version >/dev/null 2>&1 || true
+          "$RUNNER_TEMP/rulesctl" sign \
+            --channel "${{ inputs.channel }}" \
+            --digest "${{ steps.bundle.outputs.digest }}" \
+            --key-id "$RULES_SIGNING_KEY_ID" \
+            --ttl "$ttl" \
+            --out "$RUNNER_TEMP/statement.json"
+          cat "$RUNNER_TEMP/statement.json"
+
+      # Self-verify the CANDIDATE before promote. This checks the statement we just
+      # signed — NOT the live channel (which is only re-pointed in the gated
+      # promote job below) — against the engine's embedded trust keyring: signature,
+      # channel binding, freshness, and that the statement's digest matches the
+      # export we bundled. It is offline and needs no published channel release, so
+      # it works on the very first publish too. Fails closed if the keyring at
+      # engine_ref is empty/missing, which correctly blocks promotion.
+      - name: Self-verify the candidate statement
+        run: |
+          "$RUNNER_TEMP/rulesctl" verify \
+            --statement "$RUNNER_TEMP/statement.json" \
+            --bundle-dir export \
+            --keyring engine/internal/rulesign/keyring.json \
+            --channel "${{ inputs.channel }}"
+
+      - name: Upload statement artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: channel-statement
+          path: ${{ runner.temp }}/statement.json
+          retention-days: 7
+
+  # Re-point the channel release to the new statement. Gated behind the
+  # `production` environment so it requires manual approval — build/sign/verify
+  # happen above without auto-promoting.
+  promote:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download statement
+        uses: actions/download-artifact@v4
+        with:
+          name: channel-statement
+          path: stmt
+
+      # NOTE (clobber window): re-pointing the asset has a brief window where a
+      # concurrent scan could see a 404 (tolerable — engine falls back to cache)
+      # or, worse, a truncated body (hard ParseStatement failure). Promote
+      # off-peak; a fully atomic re-point would publish a versioned asset and flip
+      # a pointer, which GitHub release assets do not natively support.
+      - name: Promote channel
+        run: |
+          tag="channel-${{ inputs.channel }}"
+          if gh release view "$tag" -R "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release upload "$tag" "stmt/statement.json" --clobber -R "${{ github.repository }}"
+          else
+            # First publish for this channel. If the create loses a race, fall back
+            # to clobber-upload so the channel ends up pointed at this statement.
+            gh release create "$tag" "stmt/statement.json#statement.json" \
+              -R "${{ github.repository }}" \
+              --title "Channel: ${{ inputs.channel }}" \
+              --notes "Signed pointer to the current bundle for the ${{ inputs.channel }} channel." \
+              || gh release upload "$tag" "stmt/statement.json" --clobber -R "${{ github.repository }}"
+          fi
+          echo "promoted ${{ inputs.channel }} -> bundle ${{ needs.build.outputs.digest }}"
