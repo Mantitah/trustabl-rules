@@ -1,0 +1,175 @@
+name: Attest rule pack
+
+# Weekly per-file attestation ledger for the rule packs in this repo. This is
+# NOT the bundle/channel signing in publish.yml (Ed25519, gated production
+# environment, signs the whole resolved bundle for the engine to trust at
+# scan time). This workflow answers a narrower, audit-facing question: "was
+# this individual rule file reviewed/attested, and when." It maintains
+# attestations.json (sha256 + attested_at date + commit per rule file) and
+# signs that ledger keyless via cosign/Sigstore, using this workflow's own
+# ambient GitHub Actions OIDC identity - no signing secret to provision or
+# rotate. See attestations.json for the ledger itself.
+
+on:
+  schedule:
+    # Every Monday, 00:00 UTC. Not tied to pushes: the ledger is a periodic
+    # sweep that diffs live file content against last-recorded hashes, so any
+    # number of rule merges during the week are picked up correctly here.
+    - cron: "0 0 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write # push the ledger-update branch
+  pull-requests: write # open the PR
+  id-token: write # ambient OIDC token for keyless cosign signing
+
+env:
+  GH_TOKEN: ${{ github.token }}
+
+concurrency:
+  group: attest-rules
+  cancel-in-progress: false
+
+jobs:
+  attest:
+    runs-on: ubuntu-latest
+    # Keyless signing binds the signer identity to this workflow file at
+    # refs/heads/main on THIS repo. A fork running the same schedule would
+    # sign with a different (unpinnable) identity, so skip there.
+    if: github.repository == 'trustabl/trustabl-rules'
+    steps:
+      - name: Checkout rules
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: sigstore/cosign-installer@v3
+
+      # Walk every rule yaml (all except manifest.yaml, which is pack
+      # metadata, not a policy - see CLAUDE.md), hash it, and diff against
+      # the ledger. A file's attested_at only moves when its content
+      # (sha256) actually changes or it's new - unchanged files keep their
+      # original attestation date, so the ledger stays an honest history
+      # instead of a rubber stamp that refreshes every run.
+      - name: Update attestation ledger
+        id: ledger
+        run: |
+          python3 - <<'PYEOF'
+          import hashlib
+          import json
+          import os
+          import subprocess
+          import datetime
+
+          head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          today = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+
+          files = sorted(
+              f
+              for f in subprocess.check_output(["git", "ls-files", "*.yaml"], text=True).splitlines()
+              if f != "manifest.yaml"
+          )
+
+          ledger_path = "attestations.json"
+          try:
+              with open(ledger_path) as fh:
+                  ledger = json.load(fh)
+          except FileNotFoundError:
+              ledger = {"rules": {}}
+
+          rules = ledger.setdefault("rules", {})
+          changed = False
+
+          seen = set()
+          for f in files:
+              seen.add(f)
+              with open(f, "rb") as fh:
+                  digest = hashlib.sha256(fh.read()).hexdigest()
+              existing = rules.get(f)
+              if existing is None or existing.get("sha256") != digest:
+                  rules[f] = {
+                      "sha256": digest,
+                      "attested_at": today,
+                      "attested_commit": head,
+                  }
+                  changed = True
+
+          removed = [f for f in rules if f not in seen]
+          for f in removed:
+              del rules[f]
+              changed = True
+
+          if changed:
+              with open(ledger_path, "w", newline="\n") as fh:
+                  json.dump(ledger, fh, indent=2, sort_keys=False)
+                  fh.write("\n")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write(f"changed={'true' if changed else 'false'}\n")
+
+          print(f"rule files: {len(files)}, removed: {len(removed)}, changed={changed}")
+          PYEOF
+
+      # Keyless: no signing secret. cosign auto-detects the ambient GitHub
+      # Actions OIDC token (available because of the id-token: write
+      # permission above), exchanges it with Fulcio for a short-lived signing
+      # cert, and signs - non-interactively, no browser/login prompt (that
+      # flow only happens when running cosign keyless from a local machine).
+      # Uploads to the public Rekor transparency log by default, which is a
+      # feature here: a public, third-party-timestamped record of "Trustabl
+      # attested these rule files on this date" - not a leak, since this is
+      # already a public repo.
+      - name: Sign ledger (keyless cosign / Sigstore)
+        if: steps.ledger.outputs.changed == 'true'
+        run: |
+          cosign sign-blob --yes \
+            --output-signature attestations.json.sig \
+            --output-certificate attestations.json.pem \
+            attestations.json
+
+      # Self-verify before opening a PR, so a broken signature fails the
+      # workflow here instead of shipping a PR nobody can trust.
+      - name: Self-verify signature
+        if: steps.ledger.outputs.changed == 'true'
+        run: |
+          cosign verify-blob \
+            --certificate attestations.json.pem \
+            --signature attestations.json.sig \
+            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/attest-rules.yml@refs/heads/main" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            attestations.json
+
+      - name: Open PR with signed ledger update
+        if: steps.ledger.outputs.changed == 'true'
+        run: |
+          branch="attest-rules-update-${{ github.run_id }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add attestations.json attestations.json.sig attestations.json.pem
+          git commit -m "chore(attestation): update signed rules ledger"
+          git push origin "$branch"
+          gh pr create \
+            --base main --head "$branch" \
+            --title "chore(attestation): update signed rules ledger" \
+            --body "$(cat <<'EOF'
+          Auto-generated by `attest-rules.yml`.
+
+          Updates `attestations.json` with the rule files that are new or
+          changed since the last attestation, and re-signs it keyless via
+          cosign/Sigstore using this workflow's ambient GitHub Actions OIDC
+          identity (logged to the public Rekor transparency log).
+
+          Verify independently before merging:
+
+          ```
+          cosign verify-blob \
+            --certificate attestations.json.pem \
+            --signature attestations.json.sig \
+            --certificate-identity "https://github.com/${{ github.repository }}/.github/workflows/attest-rules.yml@refs/heads/main" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            attestations.json
+          ```
+          EOF
+          )" \
+            --label automated
