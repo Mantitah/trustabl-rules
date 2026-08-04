@@ -149,6 +149,10 @@ jobs:
           git add attestations.json attestations.json.sig attestations.json.pem
           git commit -m "chore(attestation): update signed rules ledger"
           git push origin "$branch"
+          # Idempotent: create the label if it doesn't exist yet (fresh repo has
+          # none). --force would edit an existing label's color/description on
+          # every run, so plain create + ignore "already exists" is correct here.
+          gh label create automated --color ededed --description "Opened by a workflow, not a person" 2>/dev/null || true
           gh pr create \
             --base main --head "$branch" \
             --title "chore(attestation): update signed rules ledger" \
