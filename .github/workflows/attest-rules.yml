@@ -80,11 +80,21 @@ jobs:
           rules = ledger.setdefault("rules", {})
           changed = False
 
+          def blob_sha256(path):
+              # Hash the git blob (git cat-file -p HEAD:<path>), not the raw
+              # working-tree file. Reading the working-tree file directly is
+              # sensitive to the checking-out machine's line-ending config
+              # (e.g. core.autocrlf=true on Windows silently rewrites LF to
+              # CRLF), which would make the same unchanged file hash
+              # differently depending on who/where it was hashed. The blob is
+              # exactly what's committed, so this is deterministic everywhere.
+              data = subprocess.check_output(["git", "cat-file", "-p", f"HEAD:{path}"])
+              return hashlib.sha256(data).hexdigest()
+
           seen = set()
           for f in files:
               seen.add(f)
-              with open(f, "rb") as fh:
-                  digest = hashlib.sha256(fh.read()).hexdigest()
+              digest = blob_sha256(f)
               existing = rules.get(f)
               if existing is None or existing.get("sha256") != digest:
                   rules[f] = {
