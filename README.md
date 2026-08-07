@@ -1,13 +1,21 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/trustabl/trustabl/main/assets/banner-rules.png" alt="Trustabl" width="100%">
+  <img src="https://raw.githubusercontent.com/trustabl/trustabl/main/assets/banner-rules.png" alt="Trustabl detection rules — the reliability and safety ruleset for AI agent SDKs" width="100%">
 </p>
 
-This repository holds the detection rule packs for
-[**Trustabl**](https://github.com/trustabl/trustabl), the static analyzer for
-agent reliability. The Trustabl engine ships with **no embedded rules** — it
-resolves these packs from this repository at scan time (cloning to a local
-cache, with offline fallback), so rules can be added or changed without
-rebuilding or redistributing the binary.
+The detection rule packs the Trustabl scanner reads at scan time. Apache-2.0,
+resolved by the engine on every scan — the engine ships with **no embedded
+rules**. Looking for the threat model and rationale behind each rule? That's
+[trustabl-rulebook](https://github.com/trustabl/trustabl-rulebook).
+
+Ten packs: Claude Agent SDK, Claude skills, OpenAI Agents SDK, Google ADK, MCP
+servers, LangChain / LangGraph, CrewAI, AutoGen, Pydantic AI, and the Vercel AI
+SDK — across tool, agent, subagent, skill, and repo scopes.
+
+These packs belong to [**Trustabl**](https://github.com/trustabl/trustabl), the
+open-source tool for AI agent reliability — it finds and fixes reliability,
+safety, and security defects in agent code. The engine resolves them from this
+repository at scan time (cloning to a local cache, with offline fallback), so
+rules can be added or changed without rebuilding or redistributing the binary.
 
 Every `.yaml` file in this repo (except the top-level `manifest.yaml`) defines
 one or more detection rules. The engine's loader walks this tree recursively,
@@ -41,7 +49,7 @@ Rules are grouped by `<category>/<topic>.yaml`:
 
 ```
 manifest.yaml                         schema_version (metadata, not a rule)
-claude_sdk/                           Claude Agent SDK rules (CSDK-NNN) — 30 rules
+claude_sdk/                           Claude Agent SDK rules (CSDK-NNN)
 ├── agent_safety.yaml                 CSDK-101..105 (agent); CSDK-120/130/131 (agent: permissionMode bypass + query() main-thread grants)
 ├── code_execution.yaml               CSDK-107 (python), CSDK-011 (typescript)
 ├── error_handling.yaml               CSDK-005
@@ -54,7 +62,7 @@ claude_sdk/                           Claude Agent SDK rules (CSDK-NNN) — 30 r
 ├── ssrf.yaml                         CSDK-009 (python), CSDK-013 (typescript)
 ├── subagent_safety.yaml              CSDK-110, CSDK-111 (subagent scope)
 └── tool_definition.yaml              CSDK-001, CSDK-002, CSDK-007, CSDK-008 (python), CSDK-014 (typescript)
-openai_sdk/                           OpenAI Agents SDK rules (OAI-NNN) — 32 rules
+openai_sdk/                           OpenAI Agents SDK rules (OAI-NNN)
 ├── agent_safety.yaml                 OAI-101..104, OAI-109, OAI-110 (agent); OAI-105 (agent, typescript)
 ├── approvals.yaml                    OAI-014, OAI-111 (needs_approval gates)
 ├── code_execution.yaml               OAI-013 (python), OAI-017 (typescript)
@@ -69,7 +77,7 @@ openai_sdk/                           OpenAI Agents SDK rules (OAI-NNN) — 32 r
 ├── shell_safety.yaml                 OAI-012
 ├── tool_definition.yaml              OAI-001, OAI-002, OAI-007 (python), OAI-022 (typescript)
 └── tracing.yaml                      OAI-201 (repo scope)
-google_adk/                           Google ADK rules (ADK-NNN) — 26 rules
+google_adk/                           Google ADK rules (ADK-NNN)
 ├── agent_safety.yaml                 ADK-101..108, ADK-110 (agent); ADK-109 (agent, typescript)
 ├── builtin_tools.yaml                ADK-008 (BashTool policy gate, agent scope)
 ├── code_execution.yaml               ADK-011 (python), ADK-015 (typescript)
@@ -81,7 +89,7 @@ google_adk/                           Google ADK rules (ADK-NNN) — 26 rules
 ├── shell_safety.yaml                 ADK-010
 ├── ssrf.yaml                         ADK-012 (python), ADK-016 (typescript)
 └── tool_definition.yaml              ADK-001, ADK-002, ADK-007, ADK-009 (python), ADK-013 (typescript)
-mcp/                                  Model Context Protocol rules (MCP-NNN) — 14 rules
+mcp/                                  Model Context Protocol rules (MCP-NNN)
 ├── code_execution.yaml               MCP-009, MCP-014
 ├── error_handling.yaml               MCP-006
 ├── idempotency.yaml                  MCP-007
@@ -92,8 +100,16 @@ mcp/                                  Model Context Protocol rules (MCP-NNN) —
 └── tool_definition.yaml              MCP-001, MCP-002, MCP-003, MCP-011
 ```
 
-Total: 102 rules across 45 yaml files. ID prefix denotes SDK; `NNN` tool scope,
-`1NN` agent / subagent scope, `2NN` repo scope.
+ID prefix denotes SDK; `NNN` tool scope, `1NN` agent / subagent scope, `2NN`
+repo scope. The rule count is not written down here — it changes on every rule
+ship. `trustabl rules validate` strict-loads the whole pack and is the
+authoritative count; counting `.yaml` files undercounts, since one file can
+hold several rules.
+
+> The tree above documents the four original packs. The repo now also ships
+> `claude_skill/`, `langchain/`, `crewai/`, `autogen/`, `pydantic_ai/`, and
+> `vercel_ai/` — browse the directory listing for the current set until this
+> section catches up.
 
 The category is the first path segment. Group related rules into a topic file;
 1–5 rules per file reads best. The loader walks recursively, so a new category
