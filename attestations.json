@@ -66,9 +66,9 @@
       "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
     },
     "claude_sdk/repo.yaml": {
-      "sha256": "80a0aeb8fa6eef455f7a15eedccc1c49827b6b2269aa33e802855c1582cbb0b4",
-      "attested_at": "2026-08-04",
-      "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
+      "sha256": "11a3e66db35ba990ed1b853f2ea217b1647b8b9226a98aeb38d8b9ccabeddc72",
+      "attested_at": "2026-08-17",
+      "attested_commit": "5cf9c288e82b05217020bd023e38b6aa41d3ba95"
     },
     "claude_sdk/repo_hygiene.yaml": {
       "sha256": "64f7548cf554cf1d6af17178040ec6b13b11388b5cb69e558742fec68e2e3be6",
@@ -91,9 +91,9 @@
       "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
     },
     "claude_sdk/tool_definition.yaml": {
-      "sha256": "f00ad44163fb7e2309f0f2ae3513bcad1b49a708de7da1df0c627c4310d312f2",
-      "attested_at": "2026-08-04",
-      "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
+      "sha256": "87f3926092883ccebaee9150fbca0c0519688a1f3b1e88e1c09bee42204ccd76",
+      "attested_at": "2026-08-17",
+      "attested_commit": "5cf9c288e82b05217020bd023e38b6aa41d3ba95"
     },
     "claude_skill/skill_safety.yaml": {
       "sha256": "ce5544ac36a4ca37264aa0ab70d94a2cab41716e04335052ff56f759e42bb1b7",
@@ -101,9 +101,9 @@
       "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
     },
     "crewai/agent_safety.yaml": {
-      "sha256": "9293100342a741366ba25b792152279df9521342865ce25f0b5e7651d1188896",
-      "attested_at": "2026-08-04",
-      "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
+      "sha256": "a21212ab916c11a42925691f97c99dde806efa502c795e73db8fa4d1acaea377",
+      "attested_at": "2026-08-17",
+      "attested_commit": "5cf9c288e82b05217020bd023e38b6aa41d3ba95"
     },
     "crewai/code_execution.yaml": {
       "sha256": "df73b5a5002c0f85dae4bed44570cd82471e936b3e16cad2405459cb6f744138",
@@ -419,6 +419,11 @@
       "sha256": "da76e7aa17a507811bbc674effe7bed0122b3dd7758e776c8491f90307212742",
       "attested_at": "2026-08-04",
       "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
+    },
+    "claude_skill/skill_quality_text.yaml": {
+      "sha256": "74562fda2c14f047c7f17054dfc44964d3dbe236836d20e25f9e4e46f7318514",
+      "attested_at": "2026-08-17",
+      "attested_commit": "5cf9c288e82b05217020bd023e38b6aa41d3ba95"
     }
   }
 }
