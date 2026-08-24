@@ -276,9 +276,9 @@
       "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
     },
     "openai_sdk/agent_safety.yaml": {
-      "sha256": "a4e4fb332c690d4459d00939ad36fe2fb436595db1443827629033080a276676",
-      "attested_at": "2026-08-04",
-      "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
+      "sha256": "5a726b12748341b36995e360bf2274a9a0a92b1d4dfdddc9bf976f077864f8d9",
+      "attested_at": "2026-08-24",
+      "attested_commit": "713cf65da855ec6e5b01a49fad63bf521b42f6d8"
     },
     "openai_sdk/approvals.yaml": {
       "sha256": "b8bdf9f446985f6d0257f0b7d509bc9cd8d650d0abe0aaa9a57c77c9071a6b8b",
@@ -346,9 +346,9 @@
       "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
     },
     "pydantic_ai/agent_safety.yaml": {
-      "sha256": "ad34f081cc3047b78ac5ca6ea41b2dc89be437351eac2a6bf9b3045b3c924f43",
-      "attested_at": "2026-08-04",
-      "attested_commit": "cfdfd46913007bba389c3096c7c022417c5dac66"
+      "sha256": "87b40b47302826ff894c2067e58efa3374f9774a8fc23cdcb5ade1f8db9e09ed",
+      "attested_at": "2026-08-24",
+      "attested_commit": "713cf65da855ec6e5b01a49fad63bf521b42f6d8"
     },
     "pydantic_ai/code_execution.yaml": {
       "sha256": "c1c3cbd0f3b5024e62f02abe926a55c85d3b2094ae3e6988cdfb7613c783d62b",
